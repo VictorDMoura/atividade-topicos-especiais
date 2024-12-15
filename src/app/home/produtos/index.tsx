@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { TextInput, View, Text, TouchableOpacity } from "react-native";
 import { styles } from "./style";
 import { Separator } from "@/components/separator";
+import ProductModel from "@/models/ProductModel";
 
 export default function Produtos() {
   const [state, setState] = useState({
@@ -12,6 +12,8 @@ export default function Produtos() {
     productPrice: "",
     productQty: "",
   });
+
+  const { id } = useLocalSearchParams();
 
   const handleChangeText = (key: string, value: string) => {
     setState({ ...state, [key]: value });
@@ -26,29 +28,20 @@ export default function Produtos() {
       return;
     } else {
       const listItem = {
-        id: new Date().getTime(),
+        id: null,
         name: state.productName,
         price: parseFloat(state.productPrice),
         qty: parseInt(state.productQty),
       };
 
-      let savedProducts = [];
-      const response = await AsyncStorage.getItem("products");
-
-      if (response) savedProducts = JSON.parse(response);
-      savedProducts.push(listItem);
-      console.log(savedProducts);
-      Alert.alert("Dados do Produto!", "Produto cadastrado com sucesso!");
-
-      await AsyncStorage.setItem("products", JSON.stringify(savedProducts));
-
-      setState({
-        productName: "",
-        productPrice: "",
-        productQty: "",
-      });
-      Alert.alert("Dados do Produto!", "Produto cadastrado com sucesso!");
-      router.navigate("home");
+      ProductModel.saveItem(listItem, id)
+        .then(() => router.navigate("/home/produtosLista"))
+        .catch(() =>
+          Alert.alert(
+            "Erro ao tentar cadastrar produto:",
+            "Tente novamente mais tarde!"
+          )
+        );
     }
   }
 

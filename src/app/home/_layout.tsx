@@ -1,4 +1,4 @@
-import { Stack, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { FC } from "react";
 import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
